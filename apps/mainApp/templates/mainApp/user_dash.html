@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>User Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="main.js"></script>
+  <style>
+
+
+*{
+    font-family: 'Roboto Slab', serif;
+    /* outline: 1px solid green; */
+    margin: 0;
+    padding: 0;
+    vertical-align: top;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 100;
+
+}
+
+.header{
+            width:100%;
+            background-color: rgba(34, 34, 34, 0.973);
+            color:rgb(233, 233, 233);
+            padding-top:30px;
+            text-align: center;
+            height:100px;
+        }
+
+#users {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 80%;
+    }
+
+table{
+    margin: 0 auto;
+}
+
+#users td, #customers th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#users tr:nth-child(even){background-color: #f2f2f2;}
+
+users tr:hover {background-color: #ddd;}
+
+#users th {
+    padding-top: 20px;
+    padding-bottom: 12px;
+    padding-left: 25px;
+    text-align: left;
+    background-color: rgb(63, 97, 126);
+    color: white;
+    height:60px;
+    font-size: 20px;
+}
+
+#users td{
+    padding-left: 25px;
+    font-size: 18px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+.header{
+    text-align: center;
+}
+
+#new_user{
+    text-decoration: none;
+}
+
+#new_user a{
+    text-align: center;
+}
+
+a{
+    text-decoration: none;
+    padding-left: 20px;
+    margin-left:20px;
+}
+
+h1, h2, h3, h4, h5, h6{
+    text-align: center;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: rgb(63, 97, 126);
+}
+
+li {
+    float: left;
+    
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 30px 16px 14px 16px;
+    font-size: 20px;
+    text-decoration: none;
+    height:80px;
+    width:180px;
+}
+
+li a:hover {
+    background-color: #111;
+}
+
+.action_contain{
+    display: flex;
+    justify-content: center;
+    width:100%;
+    background-color: rgb(63, 97, 126);
+    height:80px;
+    margin-bottom: 70px;
+}
+
+.welcome{
+    margin-bottom: 50px;
+    font-size: 30px;
+}
+
+.trip_head{
+    margin: 80px 0px 20px 0px;
+}
+
+</style>
+
+<body>
+    <h1 class="header">Displaying {{request.session.username}}'s WishList</h1>
+
+    <div class="action_contain">
+        <ul>
+            <li><a href="/user_dash">Home</a></li>
+            <li><a href="/add_item">Add Item</a></li>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+        
+    </div>
+
+    <div class="welcome">
+        <h2>Welcome, {{request.session.username}}!</h2>
+    </div>
+
+
+    <!--YOUR ITEMS-->
+
+
+    <h2 class="trip_head">Your WhishList Items</h2>
+
+    <table id="users">
+        <tr>
+            <th>Item</th>
+            <th>Description</th>
+            <th>Added By</th>
+            <th>Date Added</th>
+            <th>Actions</th>
+        </tr>
+
+        <!-- Loop through and add TR dependent on users-->
+        {% for i in my_items %}
+        <tr>
+            <td><a href="/show/{{i.id}}">{{i.name}}</a></td>
+            <td>{{i.description}}</td>
+            <td>{{request.session.name}}</td>
+            <td>{{i.created_at}}</td>
+            
+            <!--Add the Item to Wishlist-->
+            {% if request.session.id == i.added_by_id %}
+            <td><a href="/remove_item/{{i.id}}">Delete Item</a></td>
+            {% else %}
+            <td><a href="/unjoin_item/{{i.id}}">Remove Item From WishList</a></td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+
+        {% for i in user_favorite %}
+        <tr>
+            <td><a href="/show/{{i.item.id}}">{{i.item.name}}</a></td>
+            <td>{{i.item.description}}</td>
+            <td>{{i.item.added_by.name}}</td>
+            <td>{{i.item.created_at}}</td>
+            
+            
+            <!--Remove the Item to Wishlist-->
+            {% if request.session.id == i.item.added_by_id %}
+            <td><a href="/remove_item/{{i.item.id}}">Delete Item</a></td>
+            {% else %}
+            <td><a href="/unjoin_item/{{i.item.id}}">Remove Item From WishList</a></td>
+            {% endif %}
+        </tr>
+            {% endfor %}
+       
+    </table>
+
+
+    <!--FAVORITE ITEMS-->
+    <h2 class="trip_head">Browse Other Items</h2>
+
+    <table id="users">
+        <tr>
+            <th>Item</th>
+            <th>Description</th>
+            <th>Added By</th>
+            <th>Date Added</th>
+            <th>Actions</th>
+        </tr>
+
+        <!-- Loop through and add TR dependent on users-->
+        {% for i in all_items %}
+        <tr>
+            
+            <td><a href="/show/{{i.id}}">{{i.name}}</a></td>
+            <td>{{i.description}}</td>
+            <td>{{i.added_by.name}}</td>
+            <td>{{i.created_at}}</td>
+            
+
+            <!--Add the Item to Wishlist-->
+            <td><a href="/join_item/{{i.id}}">Add To WishList</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</body>
+</html>
